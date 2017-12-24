@@ -26,10 +26,11 @@ from sklearn.metrics import confusion_matrix, classification_report
  
 class SupervisedClassificationModels:
     
-    def __init__(self, predictors, outcome, test_frac): 
+    def __init__(self, predictors, outcome, test_frac, col_ind): 
         self._predictors = predictors
         self._outcome = outcome
         self._test_frac = test_frac
+        self._col_ind = col_ind
             
     def encode_features():    ## Yet to be written
         pass  
@@ -37,6 +38,13 @@ class SupervisedClassificationModels:
     def create_dummies():   ## Yet to be written
         pass       
         
+    def feature_engineering(self):
+    
+        self._predictors[:, self._col_ind] = np.apply_along_axis(lambda col: LabelEncoder().fit_transform(col), 0, self._predictors[:, self._col_ind])
+        self._predictors = OneHotEncoder(categorical_features = [self._col_ind]).fit_transform(self._predictors)    
+    
+        return self._predictors.toarray()
+    
     def fit_logistic_regression(self):
         """
         Fit a Logistic-Regression model on the data.
@@ -47,6 +55,8 @@ class SupervisedClassificationModels:
             cm: Confusion-Matrix
         
         """
+        
+        self._predictors = self.feature_engineering()
         
         X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
                                                             self._outcome,
@@ -79,7 +89,7 @@ class SupervisedClassificationModels:
             rf: Random-Forest object
             cm: Confusion-Matrix
         
-        """
+        """             
         
         X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
                                                             self._outcome, 
@@ -133,3 +143,26 @@ class SupervisedClassificationModels:
         
         return sv, cm
 
+
+
+# =============================================================================
+# ## Importing the dataset
+# dataset = pd.read_csv('../data/Churn_Modelling.csv')
+# X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
+# y = dataset.iloc[:, 13].values
+# 
+# LR = SupervisedClassificationModels(predictors = X, outcome = y, 
+#                                     test_frac = 0.2, col_ind = [1,2])
+# lr, cm = LR.fit_logistic_regression()
+# 
+# 
+# ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
+# X = X[:, 1:]
+# 
+# =============================================================================
+
+
+    
+    
+    
+    
