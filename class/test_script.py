@@ -28,24 +28,12 @@ dataset = pd.read_csv('../data/Churn_Modelling.csv')
 X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
 y = dataset.iloc[:, 13].values
 
-labelencoder_X_1 = LabelEncoder()
-X[:, 1] = labelencoder_X_1.fit_transform(X[:, 1])
-
-## Encoding Gender
-labelencoder_X_2 = LabelEncoder()
-X[:, 2] = labelencoder_X_2.fit_transform(X[:, 2])
-
-## Create dummy variables after encoding categorical variables:
-## For Geography:
-onehotencoder = OneHotEncoder(categorical_features = [1])
-X = onehotencoder.fit_transform(X).toarray()
-
 ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
 X = X[:, 1:]
 
 
 ## Fitting models using my module!
-LR = sm.SupervisedClassificationModels(X, y, 0.2)
+LR = sm.SupervisedClassificationModels(X, y, 0.2, [1,2])
 lr, cm = LR.fit_logistic_regression()
 
 RF = sm.SupervisedClassificationModels(X, y, 0.2)
