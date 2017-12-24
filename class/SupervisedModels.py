@@ -32,7 +32,7 @@ class SupervisedClassificationModels:
         self._test_frac = test_frac
         self._col_ind = col_ind           
         
-    def feature_engineering(self):
+    def _feature_engineering(self):
         """
         Convert categorical features (including binary features as well) into labels and 
         then create dummies of those features.
@@ -58,7 +58,7 @@ class SupervisedClassificationModels:
         
         """
         
-        self._predictors = self.feature_engineering()
+        self._predictors = self._feature_engineering()
         
         X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
                                                             self._outcome,
