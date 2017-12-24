@@ -15,5 +15,6 @@ _**test_script.py**_, in the same directory shows an example of how to use this 
 - Currently, to use this module, one needs to preprocess the data manually. I intend to automate that process up to some extent.
 
 - Possible functions for automation: Encoding and Scaling features, and data transformation/cleaning
+--- Functions for encoding featues added!
 
 ### Feel free to contribute!!
