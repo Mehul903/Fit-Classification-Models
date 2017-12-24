@@ -9,19 +9,6 @@ import SupervisedModels as sm
 import pandas as pd
 import numpy as np
 
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-# =============================================================================
-# from sklearn.model_selection import train_test_split
-# from sklearn.preprocessing import StandardScaler
-# from sklearn.model_selection import train_test_split
-# 
-# from sklearn import svm
-# from sklearn.ensemble import RandomForestClassifier
-# from sklearn.linear_model import LogisticRegression
-# from sklearn.metrics import confusion_matrix, classification_report
-# 
-# =============================================================================
-
 
 ## Importing the dataset
 dataset = pd.read_csv('../data/Churn_Modelling.csv')
@@ -33,11 +20,13 @@ y = dataset.iloc[:, 13].values
 
 
 ## Fitting models using my module!
-LR = sm.SupervisedClassificationModels(X, y, 0.2, [1,2])
-lr, cm = LR.fit_logistic_regression()
+LR = SupervisedClassificationModels(predictors = X, outcome = y, 
+                                    test_frac = 0.2, col_ind = [1,2], 
+                                    class_report = True)
+lr, cm, cr = LR.fit_logistic_regression()
 
-RF = sm.SupervisedClassificationModels(X, y, 0.2, [1,2])
-rf, cm = RF.fit_random_forest()
+RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+rf, cm, cr = RF.fit_random_forest()
 
-SV = sm.SupervisedClassificationModels(X, y, 0.2, [1,2])
-sv, cm = SV.fit_support_vector_classifier()
+SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+SV, cm, cr = RF.fit_support_vector_classifier()
