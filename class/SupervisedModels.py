@@ -19,6 +19,11 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 
 ## Class to implement various classification methods on the data:
+### While initiating the class, it requires three arguments:
+### 1. predictors: Numpy-matrix of predictors
+### 1. outcome: Numpy-array of true-labels
+### 3. test_frac: Proportion of test fraction
+ 
 class SupervisedClassificationModels:
     
     def __init__(self, predictors, outcome, test_frac): 
@@ -32,9 +37,16 @@ class SupervisedClassificationModels:
     def create_dummies():   ## Yet to be written
         pass       
         
-    ## Customize the logistic-regression object by allowing users to provide extra set of arguments
-    ## in this function:
     def fit_logistic_regression(self):
+        """
+        Fit a Logistic-Regression model on the data.
+        
+        Args: None
+        Return: 
+            lr: Logistic-Regression object
+            cm: Confusion-Matrix
+        
+        """
         
         X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
                                                             self._outcome,
@@ -59,6 +71,15 @@ class SupervisedClassificationModels:
     ## Customize the random-forest object by allowing users to provide extra set of arguments
     ## in this function:
     def fit_random_forest(self):
+        """
+        Fit a Random-Forest model on the data.
+        
+        Args: None
+        Return: 
+            rf: Random-Forest object
+            cm: Confusion-Matrix
+        
+        """
         
         X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
                                                             self._outcome, 
@@ -81,7 +102,16 @@ class SupervisedClassificationModels:
         return rf, cm
 
 
-    def fit_svc(self):
+    def fit_support_vector_classifier(self):
+        """
+        Fit a Support-Vector-Classifier on the data.
+        
+        Args: None
+        Return: 
+            sv: Support-Vector-Classifier object
+            cm: Confusion-Matrix
+        
+        """
         
         X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
                                                             self._outcome, 
@@ -103,21 +133,3 @@ class SupervisedClassificationModels:
         
         return sv, cm
 
-
-
-# =============================================================================
-# ## Simple class to add given list of numbers:
-# class calculator:
-#     
-#     def __init__(self):        
-#         pass    
-#     
-#     def addition(self, *args):        
-#         
-#         total = 0
-#         for val in args:
-#             total+=val
-#         
-#         return total
-# 
-# =============================================================================
