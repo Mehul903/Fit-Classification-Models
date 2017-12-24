@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 
 
 ## Class to implement various classification methods on the data:
@@ -24,11 +24,12 @@ from sklearn.metrics import confusion_matrix, classification_report
  
 class SupervisedClassificationModels:
     
-    def __init__(self, predictors, outcome, test_frac, col_ind): 
+    def __init__(self, predictors, outcome, test_frac, col_ind, class_report = False): 
         self._predictors = predictors
         self._outcome = outcome
         self._test_frac = test_frac
-        self._col_ind = col_ind           
+        self._col_ind = col_ind    
+        self._class_report = class_report
         
     def _feature_engineering(self):
         """
@@ -54,6 +55,7 @@ class SupervisedClassificationModels:
         
         
         return X_train, X_test, y_train, y_test
+    
     
     def fit_logistic_regression(self):
         """
@@ -81,12 +83,20 @@ class SupervisedClassificationModels:
         y_pred = lr.predict(X_test)
         cm = confusion_matrix(y_pred = y_pred, y_true = y_test)
        
-#        print (classification_report(y_pred = y_pred, y_true = y_test))
+        p,r,f,s = precision_recall_fscore_support(y_true = y_test, y_pred = y_pred)
+        
+        if self._class_report:
+            
+            classification_report = pd.DataFrame({'Precision': p, 
+                                                  'Recall': r, 
+                                                  'F_score': f, 
+                                                  'Support': s, 
+                                                  'Class': np.unique(y_test)})
+            return lr, cm, classification_report
         
         return lr, cm
 
-    ## Customize the random-forest object by allowing users to provide extra set of arguments
-    ## in this function:
+
     def fit_random_forest(self):
         """
         Fit a Random-Forest model on the data.
@@ -113,7 +123,16 @@ class SupervisedClassificationModels:
         y_pred = rf.predict(X_test)
         cm = confusion_matrix(y_pred = y_pred, y_true = y_test)
        
-#        print (classification_report(y_pred = y_pred, y_true = y_test))
+        p,r,f,s = precision_recall_fscore_support(y_true = y_test, y_pred = y_pred)
+        
+        if self._class_report:
+            
+            classification_report = pd.DataFrame({'Precision': p, 
+                                                  'Recall': r, 
+                                                  'F_score': f, 
+                                                  'Support': s, 
+                                                  'Class': np.unique(y_test)})
+            return rf, cm, classification_report 
         
         return rf, cm
 
@@ -144,7 +163,16 @@ class SupervisedClassificationModels:
         y_pred = sv.predict(X_test)
         cm = confusion_matrix(y_pred = y_pred, y_true = y_test)
        
-#        print (classification_report(y_pred = y_pred, y_true = y_test))
+        p,r,f,s = precision_recall_fscore_support(y_true = y_test, y_pred = y_pred)
+        
+        if self._class_report:
+            
+            classification_report = pd.DataFrame({'Precision': p, 
+                                                  'Recall': r, 
+                                                  'F_score': f, 
+                                                  'Support': s, 
+                                                  'Class': np.unique(y_test)})
+            return sv, cm, classification_report
         
         return sv, cm
 
@@ -157,14 +185,15 @@ class SupervisedClassificationModels:
 # y = dataset.iloc[:, 13].values
 # 
 # LR = SupervisedClassificationModels(predictors = X, outcome = y, 
-#                                     test_frac = 0.2, col_ind = [1,2])
-# lr, cm = LR.fit_logistic_regression()
+#                                     test_frac = 0.2, col_ind = [1,2], 
+#                                     class_report = True)
+# lr, cm, cr = LR.fit_logistic_regression()
 # 
-# RF = SupervisedClassificationModels(X, y, 0.2, [1,2])
-# rf, cm = RF.fit_random_forest()
+# RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+# rf, cm, cr = RF.fit_random_forest()
 # 
-# SV = SupervisedClassificationModels(X, y, 0.2, [1,2])
-# SV, cm = RF.fit_support_vector_classifier()
+# SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+# SV, cm, cr = RF.fit_support_vector_classifier()
 # 
 # ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
 # X = X[:, 1:]
