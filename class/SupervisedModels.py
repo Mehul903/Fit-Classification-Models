@@ -4,8 +4,6 @@
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split
@@ -47,6 +45,16 @@ class SupervisedClassificationModels:
     
         return self._predictors.toarray()
     
+    def _train_test_split(self):
+        
+        X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
+                                                            self._outcome,
+                                                            test_size = self._test_frac,
+                                                            random_state = 0)
+        
+        
+        return X_train, X_test, y_train, y_test
+    
     def fit_logistic_regression(self):
         """
         Fit a Logistic-Regression model on the data.
@@ -60,11 +68,8 @@ class SupervisedClassificationModels:
         
         self._predictors = self._feature_engineering()
         
-        X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
-                                                            self._outcome,
-                                                            test_size = self._test_frac,
-                                                            random_state = 0)
-        
+        X_train, X_test, y_train, y_test = self._train_test_split()
+
         ## Feature Scaling
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
@@ -93,10 +98,9 @@ class SupervisedClassificationModels:
         
         """             
         
-        X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
-                                                            self._outcome, 
-                                                            test_size = self._test_frac, 
-                                                            random_state = 0)
+        self._predictors = self._feature_engineering()
+        
+        X_train, X_test, y_train, y_test = self._train_test_split()
         
         ## Feature Scaling
         scaler = StandardScaler()
@@ -125,10 +129,9 @@ class SupervisedClassificationModels:
         
         """
         
-        X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
-                                                            self._outcome, 
-                                                            test_size = self._test_frac, 
-                                                            random_state = 0)
+        self._predictors = self._feature_engineering()
+        
+        X_train, X_test, y_train, y_test = self._train_test_split()
         
         ## Feature Scaling
         scaler = StandardScaler()
@@ -157,6 +160,11 @@ class SupervisedClassificationModels:
 #                                     test_frac = 0.2, col_ind = [1,2])
 # lr, cm = LR.fit_logistic_regression()
 # 
+# RF = SupervisedClassificationModels(X, y, 0.2, [1,2])
+# rf, cm = RF.fit_random_forest()
+# 
+# SV = SupervisedClassificationModels(X, y, 0.2, [1,2])
+# SV, cm = RF.fit_support_vector_classifier()
 # 
 # ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
 # X = X[:, 1:]
