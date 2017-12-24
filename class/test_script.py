@@ -28,13 +28,16 @@ dataset = pd.read_csv('../data/Churn_Modelling.csv')
 X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
 y = dataset.iloc[:, 13].values
 
-## Remove one of the dummy columns of country variable to avoid dummy variable trap:
-X = X[:, 1:]
+### Remove one of the dummy columns of country variable to avoid dummy variable trap:
+#X = X[:, 1:]
 
 
 ## Fitting models using my module!
 LR = sm.SupervisedClassificationModels(X, y, 0.2, [1,2])
 lr, cm = LR.fit_logistic_regression()
 
-RF = sm.SupervisedClassificationModels(X, y, 0.2)
+RF = sm.SupervisedClassificationModels(X, y, 0.2, [1,2])
 rf, cm = RF.fit_random_forest()
+
+SV = sm.SupervisedClassificationModels(X, y, 0.2, [1,2])
+sv, cm = SV.fit_support_vector_classifier()
