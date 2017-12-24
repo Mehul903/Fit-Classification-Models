@@ -30,15 +30,17 @@ class SupervisedClassificationModels:
         self._predictors = predictors
         self._outcome = outcome
         self._test_frac = test_frac
-        self._col_ind = col_ind
-            
-    def encode_features():    ## Yet to be written
-        pass  
-    
-    def create_dummies():   ## Yet to be written
-        pass       
+        self._col_ind = col_ind           
         
     def feature_engineering(self):
+        """
+        Convert categorical features (including binary features as well) into labels and 
+        then create dummies of those features.
+        
+        Args: None
+        Return: Transformed version of predictors
+        
+        """
     
         self._predictors[:, self._col_ind] = np.apply_along_axis(lambda col: LabelEncoder().fit_transform(col), 0, self._predictors[:, self._col_ind])
         self._predictors = OneHotEncoder(categorical_features = [self._col_ind]).fit_transform(self._predictors)    
