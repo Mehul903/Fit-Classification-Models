@@ -4,6 +4,7 @@
 """
 
 import numpy as np
+import pandas as pd
 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split
@@ -17,10 +18,13 @@ from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 
 
 ## Class to implement various classification methods on the data:
-### While initiating the class, it requires three arguments:
+### While initiating the class, it requires five arguments:
 ### 1. predictors: Numpy-matrix of predictors
 ### 1. outcome: Numpy-array of true-labels
 ### 3. test_frac: Proportion of test fraction
+### 4. col_ind: Indices of categorical columns in the matrix or dataframe
+### 5. class_report: Boolean to indicate whether or not to make classification report
+
  
 class SupervisedClassificationModels:
     
@@ -179,29 +183,28 @@ class SupervisedClassificationModels:
 
 
 # =============================================================================
-# ## Importing the dataset
-# dataset = pd.read_csv('../data/Churn_Modelling.csv')
-# X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
-# y = dataset.iloc[:, 13].values
+#  ## Importing the dataset
+# # dataset = pd.read_csv('../data/Churn_Modelling.csv')
+# # X = dataset.iloc[:, 3:13]   ## Removing unnecessary columns
+# # y = dataset.iloc[:, 13]
 # 
-# LR = SupervisedClassificationModels(predictors = X, outcome = y, 
-#                                     test_frac = 0.2, col_ind = [1,2], 
-#                                     class_report = True)
-# lr, cm, cr = LR.fit_logistic_regression()
-# 
-# RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
-# rf, cm, cr = RF.fit_random_forest()
-# 
-# SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
-# SV, cm, cr = RF.fit_support_vector_classifier()
-# 
-# ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
-# X = X[:, 1:]
-# 
+# # X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
+# # y = dataset.iloc[:, 13].values
+#  
+#  LR = SupervisedClassificationModels(predictors = X, outcome = y, 
+#                                      test_frac = 0.2, col_ind = [1,2], 
+#                                      class_report = True)
+#  lr, cm, cr = LR.fit_logistic_regression()
+#  
+#  RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+#  rf, cm, cr = RF.fit_random_forest()
+#  
+#  SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+#  SV, cm, cr = RF.fit_support_vector_classifier()
+#  
+#  ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
+#  X = X[:, 1:]
+#    
 # =============================================================================
-
-
-    
-    
     
     
