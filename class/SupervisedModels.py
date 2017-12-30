@@ -28,6 +28,18 @@ from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
  
 class SupervisedClassificationModels:
     
+    """
+    Fits multiple supervised classification models on the data.
+    
+    Args:
+        preedictors (numpy-matrix): Matrix of predictor variables (or features)
+        outcome (numpy-array): Array of outcome (or target variable)
+        test_frac (float): Fraction of data to be considered as test set
+        col_ind (list): List containing indices of columns of categorical-type
+        class_repot (boolean): Default 'False', if True then prints classification-report        
+    
+    """
+    
     def __init__(self, predictors, outcome, test_frac, col_ind, class_report = False): 
         self._predictors = predictors
         self._outcome = outcome
