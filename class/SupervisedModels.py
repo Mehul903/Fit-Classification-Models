@@ -56,13 +56,39 @@ class SupervisedClassificationModels:
     
         if self._matrix:
             self._predictors[:, self._col_ind] = np.apply_along_axis(lambda col: LabelEncoder().fit_transform(col), 0, self._predictors[:, self._col_ind])
+            self._predictors = OneHotEncoder(categorical_features = [self._col_ind]).fit_transform(self._predictors)    
+           
+            return self._predictors.toarray()
         
-        else:
-            self._predictors.iloc[:, self._col_ind] = self._predictors.iloc[:, self._col_ind].apply(LabelEncoder().fit_transform)
+        else:    
+            cat_data = self._predictors.iloc[:, self._col_ind]
             
-        self._predictors = OneHotEncoder(categorical_features = [self._col_ind]).fit_transform(self._predictors)    
+            self._predictors.drop(self._predictors.columns[self._col_ind], axis = 1, inplace = True)
+            original_col_names = list(self._predictors.columns)
+            
+
+            dummy_col_names = []
+            for col in self._col_ind:
+                LE = LabelEncoder()
+                cat_data.iloc[:, col-1] = LE.fit_transform(list(cat_data.iloc[:, col-1]))
+                
+                new_names_temp = [LE.classes_[i]+'_'+str(i) for i in range(len(LE.classes_))]    
+                dummy_col_names.extend(new_names_temp)
+            
     
-        return self._predictors.toarray()
+            OHE = OneHotEncoder(sparse = False)
+            cat_data = OHE.fit_transform(cat_data)    
+            cat_data = pd.DataFrame(cat_data, columns = dummy_col_names)
+    
+            self._predictors = pd.concat([self._predictors, cat_data], axis = 1)
+#            final_col_names = []
+#            final_col_names.extend(original_col_names)
+#            final_col_names.extend(dummy_col_names)
+    
+    
+            return self._predictors    
+
+    
     
     def _train_test_split(self):
         """
@@ -218,61 +244,29 @@ y = dataset.iloc[:, 13]
 # X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
 # y = dataset.iloc[:, 13].values
 
-#X[:, []] = np.apply_along_axis(lambda col: LabelEncoder().fit_transform(col), 0, X[:, []])
-
-## Subset original dataframe to get categorical features:
-col_ind = [1,2]
-X_cat_data = X.iloc[:, col_ind]
-
-## Drop categorical columns from original dataframe and save column names for future use:
-X.drop(X.columns[col_ind], axis = 1, inplace = True)
-col_names = list(X.columns)
-
-
-### Method-2: Doing it iteratively on each column. Reason: Need to save classes (or labels for encoding).
-new_col_names = []
-for col in col_ind:
-    LE = LabelEncoder()
-    X_cat_data.iloc[:, col-1] = LE.fit_transform(list(X_cat_data.iloc[:, col-1]))
-    print (LE.classes_)
-    
-    new_names_temp = [LE.classes_[i]+'_'+str(i) for i in range(len(LE.classes_))]    
-    new_col_names.extend(new_names_temp)
-    
-
-OHE = OneHotEncoder(sparse = False)
-X_cat_data = OHE.fit_transform(X_cat_data)    
-X_cat_data = pd.DataFrame(X_cat_data, columns = new_col_names)
 
 
 ## Merge above dataframe with original dataframe:
-X = pd.concat([X, X_cat_data], axis = 1)
-final_col_names = []
-final_col_names.extend(col_names)
-final_col_names.extend(new_col_names)
+#X = pd.concat([X, X_cat_data], axis = 1)
+#final_col_names = []
+#final_col_names.extend(col_names)
+#final_col_names.extend(new_col_names)
   
 
-#LR = SupervisedClassificationModels(predictors = X, outcome = y, 
-#                                      test_frac = 0.2, col_ind = [1,2], 
-#                                      class_report = True)
-#lr, cm, cr = LR.fit_logistic_regression()
+LR = SupervisedClassificationModels(predictors = X, outcome = y, 
+                                      test_frac = 0.2, col_ind = [1,2], 
+                                      class_report = True, matrix=False)
+lr, cm, cr = LR.fit_logistic_regression()
   
-
-
-
-
-
-
 
 RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
 rf, cm, cr = RF.fit_random_forest()
-  
+
+
 SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
-SV, cm, cr = RF.fit_support_vector_classifier()
+SV, cm, cr = SV.fit_support_vector_classifier()
   
 ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
-X = X[:, 1:]
-    
-# =============================================================================
-    
+#X = X[:, 1:]
+        
     
