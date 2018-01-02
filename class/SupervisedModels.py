@@ -211,34 +211,51 @@ class SupervisedClassificationModels:
 
 
 ## Importing the dataset
- dataset = pd.read_csv('../data/Churn_Modelling.csv')
- X = dataset.iloc[:, 3:13]   ## Removing unnecessary columns
- y = dataset.iloc[:, 13]
+dataset = pd.read_csv('../data/Churn_Modelling.csv')
+X = dataset.iloc[:, 3:13]   ## Removing unnecessary columns
+y = dataset.iloc[:, 13]
   
- # X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
- # y = dataset.iloc[:, 13].values
+# X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
+# y = dataset.iloc[:, 13].values
 
-X[:, []] = np.apply_along_axis(lambda col: LabelEncoder().fit_transform(col), 0, X[:, []])
+#X[:, []] = np.apply_along_axis(lambda col: LabelEncoder().fit_transform(col), 0, X[:, []])
 
+## Subset original dataframe to get categorical features:
 col_ind = [1,2]
 X_cat_data = X.iloc[:, col_ind]
+
+## Drop categorical columns from original dataframe and save column names for future use:
 X.drop(X.columns[col_ind], axis = 1, inplace = True)
 col_names = list(X.columns)
 
-LE = LabelEncoder()
-X_cat_data = X_cat_data.apply(LE.fit_transform)
-col_names_cat = list(X_cat_data.columns)
+
+### Method-2: Doing it iteratively on each column. Reason: Need to save classes (or labels for encoding).
+new_col_names = []
+for col in col_ind:
+    LE = LabelEncoder()
+    X_cat_data.iloc[:, col-1] = LE.fit_transform(list(X_cat_data.iloc[:, col-1]))
+    print (LE.classes_)
+    
+    new_names_temp = [LE.classes_[i]+'_'+str(i) for i in range(len(LE.classes_))]    
+    new_col_names.extend(new_names_temp)
+    
 
 OHE = OneHotEncoder(sparse = False)
 X_cat_data = OHE.fit_transform(X_cat_data)    
+X_cat_data = pd.DataFrame(X_cat_data, columns = new_col_names)
 
 
-
+## Merge above dataframe with original dataframe:
+X = pd.concat([X, X_cat_data], axis = 1)
+final_col_names = []
+final_col_names.extend(col_names)
+final_col_names.extend(new_col_names)
   
-  LR = SupervisedClassificationModels(predictors = X, outcome = y, 
-                                      test_frac = 0.2, col_ind = [1,2], 
-                                      class_report = True)
-  lr, cm, cr = LR.fit_logistic_regression()
+
+#LR = SupervisedClassificationModels(predictors = X, outcome = y, 
+#                                      test_frac = 0.2, col_ind = [1,2], 
+#                                      class_report = True)
+#lr, cm, cr = LR.fit_logistic_regression()
   
 
 
@@ -247,14 +264,14 @@ X_cat_data = OHE.fit_transform(X_cat_data)
 
 
 
-  RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
-  rf, cm, cr = RF.fit_random_forest()
+RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+rf, cm, cr = RF.fit_random_forest()
   
-  SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
-  SV, cm, cr = RF.fit_support_vector_classifier()
+SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+SV, cm, cr = RF.fit_support_vector_classifier()
   
-  ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
-  X = X[:, 1:]
+## Remove one of the dummy columns of country variable to avoid dummy variable trap:
+X = X[:, 1:]
     
 # =============================================================================
     
