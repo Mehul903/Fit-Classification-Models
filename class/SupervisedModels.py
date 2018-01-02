@@ -56,9 +56,9 @@ class SupervisedClassificationModels:
     
         if self._matrix:
             self._predictors[:, self._col_ind] = np.apply_along_axis(lambda col: LabelEncoder().fit_transform(col), 0, self._predictors[:, self._col_ind])
-            self._predictors = OneHotEncoder(categorical_features = [self._col_ind]).fit_transform(self._predictors)    
+            self._predictors = OneHotEncoder(categorical_features = [self._col_ind], sparse = False).fit_transform(self._predictors)    
            
-            return self._predictors.toarray()
+            return self._predictors
         
         else:    
             cat_data = self._predictors.iloc[:, self._col_ind]
@@ -238,11 +238,11 @@ class SupervisedClassificationModels:
 
 ## Importing the dataset
 dataset = pd.read_csv('../data/Churn_Modelling.csv')
-X = dataset.iloc[:, 3:13]   ## Removing unnecessary columns
-y = dataset.iloc[:, 13]
+#X = dataset.iloc[:, 3:13]   ## Removing unnecessary columns
+#y = dataset.iloc[:, 13]
   
-# X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
-# y = dataset.iloc[:, 13].values
+X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
+y = dataset.iloc[:, 13].values
 
 
 
@@ -255,15 +255,15 @@ y = dataset.iloc[:, 13]
 
 LR = SupervisedClassificationModels(predictors = X, outcome = y, 
                                       test_frac = 0.2, col_ind = [1,2], 
-                                      class_report = True, matrix=False)
+                                      class_report = True, matrix=True)
 lr, cm, cr = LR.fit_logistic_regression()
   
 
-RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True, matrix = True)
 rf, cm, cr = RF.fit_random_forest()
 
 
-SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True, matrix = True)
 SV, cm, cr = SV.fit_support_vector_classifier()
   
 ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
