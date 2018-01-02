@@ -17,18 +17,12 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 
 
-## Class to implement various classification methods on the data:
-### While initiating the class, it requires five arguments:
-### 1. predictors: Numpy-matrix of predictors
-### 1. outcome: Numpy-array of true-labels
-### 3. test_frac: Proportion of test fraction
-### 4. col_ind: Indices of categorical columns in the matrix or dataframe
-### 5. class_report: Boolean to indicate whether or not to make classification report
 
- 
 class SupervisedClassificationModels:
     
     """
+    Need to change this docstring.
+    
     Fits multiple supervised classification models on the data.
     
     Args:
@@ -36,16 +30,19 @@ class SupervisedClassificationModels:
         outcome (numpy-array): Array of outcome (or target variable)
         test_frac (float): Fraction of data to be considered as test set
         col_ind (list): List containing indices of columns of categorical-type
-        class_repot (boolean): Default 'False', if True then prints classification-report        
+        class_repot (boolean): Default 'False', if 'True' then classification-report is 
+                                saved in a dataframe.
     
     """
     
-    def __init__(self, predictors, outcome, test_frac, col_ind, class_report = False): 
+    def __init__(self, predictors, outcome, test_frac, col_ind, 
+                 class_report = False, matrix = False): 
         self._predictors = predictors
         self._outcome = outcome
         self._test_frac = test_frac
         self._col_ind = col_ind    
         self._class_report = class_report
+        self._matrix = matrix
         
     def _feature_engineering(self):
         """
@@ -57,12 +54,31 @@ class SupervisedClassificationModels:
         
         """
     
-        self._predictors[:, self._col_ind] = np.apply_along_axis(lambda col: LabelEncoder().fit_transform(col), 0, self._predictors[:, self._col_ind])
+        if self._matrix:
+            self._predictors[:, self._col_ind] = np.apply_along_axis(lambda col: LabelEncoder().fit_transform(col), 0, self._predictors[:, self._col_ind])
+        
+        else:
+            self._predictors.iloc[:, self._col_ind] = self._predictors.iloc[:, self._col_ind].apply(LabelEncoder().fit_transform)
+            
         self._predictors = OneHotEncoder(categorical_features = [self._col_ind]).fit_transform(self._predictors)    
     
         return self._predictors.toarray()
     
     def _train_test_split(self):
+        """
+        Split the data into train-test set for further modeling process. Returns a tuple of 
+        train and test set.
+        
+        Args:
+            None
+            
+        Return:
+            X_train (): Matrix of predictors-train set
+            X_test (): Matrix of predictors-test set
+            y_train (): Array of outcome-train set
+            y_test (): Array of outcome-test set            
+        
+        """
         
         X_train, X_test, y_train, y_test = train_test_split(self._predictors, 
                                                             self._outcome,
@@ -194,29 +210,52 @@ class SupervisedClassificationModels:
 
 
 
-# =============================================================================
-#  ## Importing the dataset
-# # dataset = pd.read_csv('../data/Churn_Modelling.csv')
-# # X = dataset.iloc[:, 3:13]   ## Removing unnecessary columns
-# # y = dataset.iloc[:, 13]
-# 
-# # X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
-# # y = dataset.iloc[:, 13].values
-#  
-#  LR = SupervisedClassificationModels(predictors = X, outcome = y, 
-#                                      test_frac = 0.2, col_ind = [1,2], 
-#                                      class_report = True)
-#  lr, cm, cr = LR.fit_logistic_regression()
-#  
-#  RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
-#  rf, cm, cr = RF.fit_random_forest()
-#  
-#  SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
-#  SV, cm, cr = RF.fit_support_vector_classifier()
-#  
-#  ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
-#  X = X[:, 1:]
-#    
+## Importing the dataset
+ dataset = pd.read_csv('../data/Churn_Modelling.csv')
+ X = dataset.iloc[:, 3:13]   ## Removing unnecessary columns
+ y = dataset.iloc[:, 13]
+  
+ # X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
+ # y = dataset.iloc[:, 13].values
+
+X[:, []] = np.apply_along_axis(lambda col: LabelEncoder().fit_transform(col), 0, X[:, []])
+
+col_ind = [1,2]
+X_cat_data = X.iloc[:, col_ind]
+X.drop(X.columns[col_ind], axis = 1, inplace = True)
+col_names = list(X.columns)
+
+LE = LabelEncoder()
+X_cat_data = X_cat_data.apply(LE.fit_transform)
+col_names_cat = list(X_cat_data.columns)
+
+OHE = OneHotEncoder(sparse = False)
+X_cat_data = OHE.fit_transform(X_cat_data)    
+
+
+
+  
+  LR = SupervisedClassificationModels(predictors = X, outcome = y, 
+                                      test_frac = 0.2, col_ind = [1,2], 
+                                      class_report = True)
+  lr, cm, cr = LR.fit_logistic_regression()
+  
+
+
+
+
+
+
+
+  RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+  rf, cm, cr = RF.fit_random_forest()
+  
+  SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True)
+  SV, cm, cr = RF.fit_support_vector_classifier()
+  
+  ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
+  X = X[:, 1:]
+    
 # =============================================================================
     
     
