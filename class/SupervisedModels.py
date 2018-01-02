@@ -43,6 +43,7 @@ class SupervisedClassificationModels:
         self._col_ind = col_ind    
         self._class_report = class_report
         self._matrix = matrix
+        self._predictors_temp = None
         
     def _feature_engineering(self):
         """
@@ -63,8 +64,10 @@ class SupervisedClassificationModels:
         else:    
             cat_data = self._predictors.iloc[:, self._col_ind]
             
-            self._predictors.drop(self._predictors.columns[self._col_ind], axis = 1, inplace = True)
-            original_col_names = list(self._predictors.columns)
+#            self._predictors.drop(self._predictors.columns[self._col_ind], axis = 1, inplace = True)
+            self._predictors_temp = self._predictors.drop(self._predictors.columns[self._col_ind], axis = 1)
+#            original_col_names = list(self._predictors.columns)
+            self._predictors = pd.DataFrame()
             
 
             dummy_col_names = []
@@ -80,7 +83,7 @@ class SupervisedClassificationModels:
             cat_data = OHE.fit_transform(cat_data)    
             cat_data = pd.DataFrame(cat_data, columns = dummy_col_names)
     
-            self._predictors = pd.concat([self._predictors, cat_data], axis = 1)
+            self._predictors = pd.concat([self._predictors_temp, cat_data], axis = 1)
 #            final_col_names = []
 #            final_col_names.extend(original_col_names)
 #            final_col_names.extend(dummy_col_names)
@@ -142,6 +145,7 @@ class SupervisedClassificationModels:
         cm = confusion_matrix(y_pred = y_pred, y_true = y_test)
        
         p,r,f,s = precision_recall_fscore_support(y_true = y_test, y_pred = y_pred)
+        print ('Done.')
         
         if self._class_report:
             
@@ -236,37 +240,39 @@ class SupervisedClassificationModels:
 
 
 
-## Importing the dataset
-dataset = pd.read_csv('../data/Churn_Modelling.csv')
-#X = dataset.iloc[:, 3:13]   ## Removing unnecessary columns
-#y = dataset.iloc[:, 13]
-  
-X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
-y = dataset.iloc[:, 13].values
-
-
-
-## Merge above dataframe with original dataframe:
-#X = pd.concat([X, X_cat_data], axis = 1)
-#final_col_names = []
-#final_col_names.extend(col_names)
-#final_col_names.extend(new_col_names)
-  
-
-LR = SupervisedClassificationModels(predictors = X, outcome = y, 
-                                      test_frac = 0.2, col_ind = [1,2], 
-                                      class_report = True, matrix=True)
-lr, cm, cr = LR.fit_logistic_regression()
-  
-
-RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True, matrix = True)
-rf, cm, cr = RF.fit_random_forest()
-
-
-SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True, matrix = True)
-SV, cm, cr = SV.fit_support_vector_classifier()
-  
-## Remove one of the dummy columns of country variable to avoid dummy variable trap:
-#X = X[:, 1:]
-        
+# =============================================================================
+# ## Importing the dataset
+# dataset = pd.read_csv('../data/Churn_Modelling.csv')
+# #X = dataset.iloc[:, 3:13]   ## Removing unnecessary columns
+# #y = dataset.iloc[:, 13]
+#   
+# X = dataset.iloc[:, 3:13].values  ## Removing unnecessary columns
+# y = dataset.iloc[:, 13].values
+# 
+# 
+# 
+# ## Merge above dataframe with original dataframe:
+# #X = pd.concat([X, X_cat_data], axis = 1)
+# #final_col_names = []
+# #final_col_names.extend(col_names)
+# #final_col_names.extend(new_col_names)
+#   
+# 
+# LR = SupervisedClassificationModels(predictors = X, outcome = y, 
+#                                       test_frac = 0.2, col_ind = [1,2], 
+#                                       class_report = True, matrix=True)
+# lr, cm, cr = LR.fit_logistic_regression()
+#   
+# 
+# RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True, matrix = True)
+# rf, cm, cr = RF.fit_random_forest()
+# 
+# 
+# SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True, matrix = True)
+# SV, cm, cr = SV.fit_support_vector_classifier()
+#   
+# ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
+# #X = X[:, 1:]
+#         
+# =============================================================================
     
