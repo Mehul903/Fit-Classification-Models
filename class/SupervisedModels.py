@@ -202,6 +202,9 @@ class SupervisedClassificationModels:
 
     def plot_feature_importance(self):
         
+        plt.rc('ytick', labelsize = 14)
+        plt.rc('xtick', labelsize = 12)
+        
         ## Plot feature importance for Random-Forest:
         feature_importance = self._rf.feature_importances_
         features = self._predictors.columns
@@ -210,11 +213,11 @@ class SupervisedClassificationModels:
         ft_imp_df.sort_values(by = 'Feature_Importance', ascending = False, inplace = True)
         ft_imp_df.reset_index(inplace = True, drop = True)
         
-        fig, ax = plt.subplots(figsize = (12,6))
-        ft_imp_df.plot(y = 'Feature_Importance', x = 'Features', ax = ax, kind = 'barh')
-        ax.set_xlabel('Relative Importance of Features')
-        ax.set_ylabel('Features')
-        ax.set_title('RF: Feature Importance Plot', fontsize = 20)
+        fig, ax = plt.subplots(figsize = (7,4))
+        ft_imp_df.head().plot(y = 'Feature_Importance', x = 'Features', ax = ax, kind = 'barh')
+        ax.set_xlabel('Relative Importance of Features', fontsize = 18)
+        ax.set_ylabel('Features', fontsize = 18)
+        ax.set_title('RF: Feature Importance Plot \n (Customer Churn Example)', fontsize = 20)
         
         
         return fig, ax
