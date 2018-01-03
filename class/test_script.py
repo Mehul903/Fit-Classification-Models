@@ -56,6 +56,7 @@ RF = sm.SupervisedClassificationModels(predictors = X, outcome = y,
                                        test_frac = 0.2, col_ind = [1,2], 
                                        class_report = True)
 rf, cm, cr = RF.fit_random_forest()
+fig, ax = RF.plot_feature_importance()
 print ('Confusion matrix for Random-Forest: \n', cm)
 print ('Classification report for Random-Forest: \n', cr)
 
