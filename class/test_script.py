@@ -47,28 +47,28 @@ y = dataset.iloc[:, 13]
 LR = sm.SupervisedClassificationModels(predictors = X, outcome = y, 
                                        test_frac = 0.2, col_ind = [1,2], 
                                        class_report = True)
-lr, cm, cr = LR.fit_logistic_regression()
+lr, cm, cr_lr = LR.fit_logistic_regression()
 print ('Confusion matrix for Logistic-Regression: \n', cm)
-print ('Classification report for Logistic-Regression: \n', cr)
+print ('Classification report for Logistic-Regression: \n', cr_lr)
 
 
 RF = sm.SupervisedClassificationModels(predictors = X, outcome = y, 
                                        test_frac = 0.2, col_ind = [1,2], 
                                        class_report = True)
-rf, cm, cr = RF.fit_random_forest()
+rf, cm, cr_rf = RF.fit_random_forest()
 fig, ax = RF.plot_feature_importance()
 print ('Confusion matrix for Random-Forest: \n', cm)
-print ('Classification report for Random-Forest: \n', cr)
+print ('Classification report for Random-Forest: \n', cr_rf)
 
 
 SV = sm.SupervisedClassificationModels(predictors = X, outcome = y, 
                                        test_frac = 0.2, col_ind = [1,2], 
                                        class_report = True)
-SV, cm, cr = SV.fit_support_vector_classifier()
+SV, cm, cr_sv = SV.fit_support_vector_classifier()
 print ('Confusion matrix for Support-Vector-Classifier: \n', cm)
-print ('Classification report for Support-Vector-Classifier: \n', cr)
+print ('Classification report for Support-Vector-Classifier: \n', cr_sv)
 
-
+fig, ax = sm.SupervisedClassificationModels.compare_models(cr_lr, cr_rf, cr_sv)
 
 
 
