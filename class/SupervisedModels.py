@@ -46,6 +46,11 @@ class SupervisedClassificationModels:
         self._matrix = matrix
         self._predictors_temp = None
         self._rf = None  ## A Random-Forest object
+        self._lr = None  ## A Logistic-Regression object
+        self._sv = None  ## A Support-Vector object
+        self._classification_report_rf = None  ## Classification dataframe: RF
+        self._classification_report_lr = None  ## Classification dataframe: LR
+        self._classification_report_sv = None  ## Classification dataframe: SV        
         
         
     def _feature_engineering(self):
@@ -150,12 +155,13 @@ class SupervisedClassificationModels:
         
         if self._class_report:
             
-            classification_report = pd.DataFrame({'Precision': p, 
-                                                  'Recall': r, 
-                                                  'F_score': f, 
-                                                  'Support': s, 
-                                                  'Class': np.unique(y_test)})
-            return lr, cm, classification_report
+            self._classification_report_lr = pd.DataFrame({'Precision': p, 
+                                                          'Recall': r, 
+                                                          'F_score': f, 
+                                                          'Support': s, 
+                                                          'Class': np.unique(y_test),
+                                                          'Model': ['LR']*len(set(y_test))})
+            return lr, cm, self._classification_report_lr
         
         return lr, cm
 
@@ -190,12 +196,13 @@ class SupervisedClassificationModels:
         
         if self._class_report:
             
-            classification_report = pd.DataFrame({'Precision': p, 
-                                                  'Recall': r, 
-                                                  'F_score': f, 
-                                                  'Support': s, 
-                                                  'Class': np.unique(y_test)})
-            return self._rf, cm, classification_report 
+            self._classification_report_rf = pd.DataFrame({'Precision': p, 
+                                                          'Recall': r, 
+                                                          'F_score': f, 
+                                                          'Support': s, 
+                                                          'Class': np.unique(y_test),
+                                                          'Model': ['RF']*len(set(y_test))})
+            return self._rf, cm, self._classification_report_rf
         
         return self._rf, cm
 
@@ -252,18 +259,37 @@ class SupervisedClassificationModels:
         
         if self._class_report:
             
-            classification_report = pd.DataFrame({'Precision': p, 
-                                                  'Recall': r, 
-                                                  'F_score': f, 
-                                                  'Support': s, 
-                                                  'Class': np.unique(y_test)})
-            return sv, cm, classification_report
+            self._classification_report_sv = pd.DataFrame({'Precision': p, 
+                                                          'Recall': r, 
+                                                          'F_score': f, 
+                                                          'Support': s, 
+                                                          'Class': np.unique(y_test),
+                                                          'Model': ['SV']*len(set(y_test))})
+            return sv, cm, self._classification_report_sv
         
         return sv, cm
 
-
-
+  
+    def compare_models(lr_df, rf_df, sv_df):
+      
+#        comparison_df = pd.concat([self._classification_report_lr, self._classification_report_rf, self._classification_report_sv])
+        comparison_df = pd.concat([lr_df, rf_df, sv_df])        
+        
+        plt.rc('xtick', labelsize = 14)
+        plt.rc('legend', fontsize = 14)
+        
+        fig, ax = plt.subplots(figsize = (10,5))
+        comparison_df.plot(x = ['Model', 'Class'], y = ['Precision', 'Recall', 'F_score'], kind = 'bar', ax = ax)
+        ax.set_xlabel('Model & Class', fontsize = 18)
+        ax.set_ylabel('Performace', fontsize = 18)
+        ax.set_ylim(0, 1.2)
+        ax.set_title('Comparison of Models \n (Customer Churn Example)', fontsize = 20)
+        ax.legend(bbox_to_anchor = (0.88,1), ncol = 3)
+        
+        return  fig, ax
+		
 # =============================================================================
+# 	
 # ## Importing the dataset
 # dataset = pd.read_csv('../data/Churn_Modelling.csv')
 # X = dataset.iloc[:, 3:13]   ## Removing unnecessary columns
@@ -304,16 +330,41 @@ class SupervisedClassificationModels:
 # #final_col_names.extend(new_col_names)
 #   
 # 
-# #LR = SupervisedClassificationModels(predictors = X, outcome = y, 
-# #                                      test_frac = 0.2, col_ind = [1,2], 
-# #                                      class_report = True, matrix=True)
-# #lr, cm, cr = LR.fit_logistic_regression()
+# LR = SupervisedClassificationModels(predictors = X, outcome = y, 
+#                                       test_frac = 0.2, col_ind = [1,2], 
+#                                       class_report = True)
+# lr, cm, cr_lr = LR.fit_logistic_regression()
 #   
 # 
-# RF = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True, matrix = False)
-# rf, cm, cr = RF.fit_random_forest()
+# RF = SupervisedClassificationModels(X, y, 0.2, [1,2], 
+#                                     class_report = True)
+# rf, cm, cr_rf = RF.fit_random_forest()
 # fig, ax = RF.plot_feature_importance()
 # 
+# SV = SupervisedClassificationModels(X, y, 0.2, [1,2], 
+#                                     class_report = True)
+# SV, cm, cr_sv = SV.fit_support_vector_classifier()
+# 
+# fig, ax = SupervisedClassificationModels.compare_models(cr_lr, cr_rf, cr_sv)
+# 
+# 
+# comparison_df = pd.concat([cr_lr, cr_rf, cr_sv])
+# comparison_df.reset_index(inplace = True, drop = True)
+# 
+# plt.rc('xtick', labelsize = 14)
+# plt.rc('legend', fontsize = 12)
+# 
+# fig, ax = plt.subplots(figsize = (8,5))
+# comparison_df.plot(x = ['Model', 'Class'], y = ['Precision', 'Recall', 'F_score'], kind = 'bar', ax = ax)
+# ax.set_xlabel('Model & Class', fontsize = 18)
+# ax.set_ylabel('Performace', fontsize = 18)
+# ax.set_ylim(0, 1.2)
+# ax.set_title('Comparison of Models', fontsize = 20)
+# ax.legend(bbox_to_anchor = (0.88,1), ncol = 3)
+# plt.show()
+# 
+# =============================================================================
+# =============================================================================
 # ### Plot feature importance for Random-Forest:
 # #feature_importance = rf.feature_importances_
 # #features = X.columns
@@ -338,12 +389,10 @@ class SupervisedClassificationModels:
 # #graph = graphviz.Source(dot_data)  
 # #graph
 # 
-# #SV = SupervisedClassificationModels(X, y, 0.2, [1,2], class_report = True, matrix = True)
-# #SV, cm, cr = SV.fit_support_vector_classifier()
-#   
-# ## Remove one of the dummy columns of country variable to avoid dummy variable trap:
-# #X = X[:, 1:]
-#         
-#     
-# 
 # =============================================================================
+  
+## Remove one of the dummy columns of country variable to avoid dummy variable trap:
+#X = X[:, 1:]
+        
+    
+
